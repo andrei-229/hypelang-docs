@@ -1,0 +1,6 @@
+{
+  "name": "Hype IDE",
+  "description": "A browser-based IDE and functional programming playground for the Hype language, featuring a custom AST interpreter and real-time execution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
