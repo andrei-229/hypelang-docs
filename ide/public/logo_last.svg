@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420">
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="78" y1="210" x2="342" y2="210">
+      <stop offset="0%"   stop-color="#C820F2"/>
+      <stop offset="55%"  stop-color="#8A6FFF"/>
+      <stop offset="100%" stop-color="#6A80FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- { left brace -->
+  <path d="
+    M 155 48
+    C 128 48, 108 64, 108 92
+    L 108 170
+    C 108 193, 78 197, 78 210
+    C 78 223, 108 227, 108 250
+    L 108 328
+    C 108 356, 128 372, 155 372
+  " fill="none" stroke="url(#g)" stroke-width="30"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- } right brace -->
+  <path d="
+    M 265 48
+    C 292 48, 312 64, 312 92
+    L 312 170
+    C 312 193, 342 197, 342 210
+    C 342 223, 312 227, 312 250
+    L 312 328
+    C 312 356, 292 372, 265 372
+  " fill="none" stroke="url(#g)" stroke-width="30"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!--
+    sin(x)  on  -11π/12 < x < 11π/12  (cut before next zero-crossing)
+    Starts BELOW center (y=231), crosses at (210,210), ends ABOVE center (y=189)
+  -->
+  <path d="
+    M 128 231
+    C 150 295, 182 295, 210 210
+    C 238 125, 270 125, 292 189
+  " fill="none" stroke="url(#g)" stroke-width="25" stroke-linecap="round"/>
+
+  <!--
+    -sin(x) — mirror: starts ABOVE center (y=189), crosses at (210,210), ends BELOW (y=231)
+  -->
+  <path d="
+    M 128 189
+    C 150 125, 182 125, 210 210
+    C 238 295, 270 295, 292 231
+  " fill="none" stroke="url(#g)" stroke-width="25" stroke-linecap="round"/>
+</svg>

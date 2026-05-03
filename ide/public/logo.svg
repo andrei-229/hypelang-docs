@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<svg width="420" height="420" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient id="svg_9" x1="0" x2="1" y1="0.5" y2="0.5">
+   <stop offset="0%" stop-color="#C820F2"/>
+   <stop offset="55%" stop-color="#8A6FFF"/>
+   <stop offset="100%" stop-color="#6A80FF"/>
+  </linearGradient>
+ </defs>
+ <!-- { left brace -->
+ <!-- } right brace -->
+ <!--
+    sin(x)  on  -11π/12 < x < 11π/12  (cut before next zero-crossing)
+    Starts BELOW center (y=231), crosses at (210,210), ends ABOVE center (y=189)
+  -->
+ <!--
+    -sin(x) — mirror: starts ABOVE center (y=189), crosses at (210,210), ends BELOW (y=231)
+  -->
+ <g class="layer">
+  <title>Layer 1</title>
+  <path d="m93,41c-27,0 -47,16 -47,44l0,78c0,23 -30,27 -30,40c0,13 30,17 30,40l0,78c0,28 20,44 47,44" fill="none" id="svg_1" stroke="url(#svg_9)" stroke-linecap="round" stroke-linejoin="round" stroke-width="30"/>
+  <path d="m325,44c27,0 47,16 47,44l0,78c0,23 30,27 30,40c0,13 -30,17 -30,40l0,78c0,28 -20,44 -47,44" fill="none" id="svg_2" stroke="url(#svg_9)" stroke-linecap="round" stroke-linejoin="round" stroke-width="30" transform="matrix(1 0 0 1 0 0)"/>
+  <path d="m245.26,161.64c147.39,-47.59 89.48,185.71 -43.68,38.56c-133.15,-147.16 -166.7,98.55 -43.68,38.56" fill="none" id="svg_7" stroke="url(#svg_9)" stroke-linecap="round" stroke-width="25"/>
+ </g>
+</svg>

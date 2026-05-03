@@ -1,0 +1,17 @@
+{
+  "name": "hypelang-ide",
+  "version": "0.1.0",
+  "description": "A beautiful web-based IDE for the HypeLang functional language",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.52.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
