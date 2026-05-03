@@ -5,14 +5,16 @@ import { runProgram } from './lib/aura/interpreter';
 import { CodeEditor } from './components/CodeEditor';
 import { Console } from './components/Console';
 
-const INITIAL_CODE = `flow fact n {
-  when n <= 1 yield 1
-  else yield n * fact(n - 1)
+const INITIAL_CODE = `flow fact(n) {
+  match n {
+    0 -> 1
+    _ -> n * fact(n - 1)
+  }
 }
 
-flow main {
-  print("Factorial of 5:")
-  print(fact(5))
+flow main() {
+  let result = fact(5)
+  print "Factorial of 5 is: " + result
 }`;
 
 export default function App() {
@@ -161,47 +163,120 @@ export default function App() {
                 </div>
                 <div className="flex-1 overflow-auto p-6 space-y-8 font-sans">
                   <section>
-                    <h3 className="text-indigo-400 font-bold mb-2 uppercase text-xs tracking-widest">Basics</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <code className="text-emerald-400">flow main &#123; ... &#125;</code>
-                        <p className="text-xs text-slate-500 mt-1">Entry point of every program.</p>
-                      </div>
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <code className="text-emerald-400">let x = 10</code>
-                        <p className="text-xs text-slate-500 mt-1">Local variable binding.</p>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">1. Функции и Точка входа</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2 text-sm">
+                      <p className="text-slate-400">Каждая программа на HypeLang начинается с функции <code className="text-slate-300">main()</code>. Функции объявляются с помощью ключевого слова <code className="text-slate-300">flow</code>.</p>
+                      <pre className="text-emerald-400 mt-2 bg-slate-900/50 p-2 rounded">
+flow myFunc(arg1, arg2) &#123;
+  // тело функции
+&#125;
+
+flow main() &#123;
+  print("Hello, HypeLang!")
+&#125;
+                      </pre>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">2. Переменные и Типы данных</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-4 text-sm">
+                      <p className="text-slate-400">Поддерживаются числа (Int), логические значения (Bool), строки (String) и списки (List). Для объявления используется <code className="text-slate-300">let</code>.</p>
+                      <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded">
+let x = 42
+let msg = "Hello"
+let flag = true
+let arr = [1, 2, 3, 4]
+                      </pre>
+                      <p className="text-slate-400 mt-2">Мутация переменных:</p>
+                      <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded">
+x = 100
+x += 5
+x++
+                      </pre>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">3. Ветвления и Циклы</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-4 text-sm">
+                      <p className="text-slate-400">Доступны условные операторы <code className="text-slate-300">when ... else</code>, а также циклы <code className="text-slate-300">while</code> и <code className="text-slate-300">for ... in</code>.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded h-full">
+when x &gt; 10 &#123;
+  print("Greater")
+&#125; else &#123;
+  print("Lesser or Eq")
+&#125;
+                          </pre>
+                        </div>
+                        <div>
+                          <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded h-full">
+for i in range(1, 5) &#123;
+  print(i)
+&#125;
+
+while x &lt; 100 &#123;
+  x += 10
+&#125;
+                          </pre>
+                        </div>
                       </div>
                     </div>
                   </section>
 
                   <section>
-                    <h3 className="text-indigo-400 font-bold mb-2 uppercase text-xs tracking-widest">Flow Control</h3>
-                    <div className="space-y-3">
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <code className="text-emerald-400">when condition yield value</code>
-                        <p className="text-xs text-slate-500 mt-1">Early return from a flow.</p>
-                      </div>
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <pre className="text-emerald-400 text-xs mt-1">match x &#123;
-  0 {"->"} "zero"
-  _ {"->"} "other"
-&#125;</pre>
-                        <p className="text-xs text-slate-500 mt-1">Pattern matching on values.</p>
-                      </div>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">4. Сопоставление с шаблоном (Pattern Matching)</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2 text-sm">
+                      <p className="text-slate-400">Конструкция <code className="text-slate-300">match</code> позволяет удобно ветвить логику на основе значений. Шаблон <code className="text-slate-300">_</code> используется по умолчанию (wildcard).</p>
+                      <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded">
+match n &#123;
+  0 {"->"} "Zero"
+  1 {"->"} "One"
+  _ {"->"} "Other value"
+&#125;
+                      </pre>
                     </div>
                   </section>
 
                   <section>
-                    <h3 className="text-indigo-400 font-bold mb-2 uppercase text-xs tracking-widest">Functional</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <code className="text-emerald-400">fun x {"->"} x + 1</code>
-                        <p className="text-xs text-slate-500 mt-1">Lambda / Anonymous functions.</p>
-                      </div>
-                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        <code className="text-emerald-400">map(f, list)</code>
-                        <p className="text-xs text-slate-500 mt-1">Common high-order functions.</p>
-                      </div>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">5. Ленивые вычисления</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2 text-sm">
+                      <p className="text-slate-400">С помощью операторов <code className="text-slate-300">lazy</code> и <code className="text-slate-300">force</code> можно откладывать вычисления до их явного вызова.</p>
+                      <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded">
+let heavy = lazy (fact(20))
+// Вычисление произойдет только здесь:
+let result = force(heavy)
+                      </pre>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">6. Встроенные функции (Списки)</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 text-sm">
+                      <ul className="text-slate-400 space-y-2 list-disc list-inside px-4">
+                        <li><code className="text-slate-300">head(list)</code> — возвращает первый элемент.</li>
+                        <li><code className="text-slate-300">tail(list)</code> — возвращает список без первого элемента.</li>
+                        <li><code className="text-slate-300">cons(x, list)</code> — добавляет элемент в начало.</li>
+                        <li><code className="text-slate-300">len(list)</code> — длина списка.</li>
+                        <li><code className="text-slate-300">isEmpty(list)</code> — проверка на пустоту.</li>
+                        <li><code className="text-slate-300">append(list1, list2)</code> — объединение списков.</li>
+                        <li><code className="text-slate-300">range(from, to)</code> — список чисел от и до (включительно).</li>
+                        <li><code className="text-slate-300">map(fn, list)</code> — применяет функцию к списку элементов.</li>
+                      </ul>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-indigo-400 font-bold mb-3 uppercase text-xs tracking-widest border-b border-slate-800 pb-2">7. Визуализация и Графики</h3>
+                    <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2 text-sm">
+                      <p className="text-slate-400">Язык поддерживает встроенные команды для построения графиков из терминала и web-интерфейса.</p>
+                      <pre className="text-emerald-400 bg-slate-900/50 p-2 rounded">
+lineChart(range(1, 10))
+barChart([10, 20, 15, 30])
+scatterChart([1, 2, 3])
+                      </pre>
                     </div>
                   </section>
                 </div>

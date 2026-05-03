@@ -1,20 +1,59 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# HypeLang
 
-# Run and deploy your AI Studio app
+HypeLang is an interpreted programming language designed for data processing, flow-based script orchestrations, and interactive chart plotting. It features a robust type system, pattern matching, pure evaluations, functional paradigms, and built-in plotting capacities right out of the box.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/70b6ad06-1fbe-49ac-a98c-f331d47c6024
+- **Purity and Mutability:** Clear distinction between let-bindings (immutable by default) and mutable assignments.
+- **Pattern Matching:** Advanced matching over primitives, strings, booleans, and wildcard patterns using `match ... { when ... yield ... }` construct.
+- **Lazy Evaluation:** Primitives like `lazy` and `force` explicitly control evaluation deferral, helpful with costly computations.
+- **Flow Definitions:** Use declarative top-level `flow` definitions to orchestrate execution, instead of standard function structures, maximizing readability in scripting data pipelines.
+- **Rich Built-Ins:** Extensive list manipulation `head`, `tail`, `cons`, `map`, `filter`, `foldl`, and charts like `lineChart`, `barChart`, `scatterChart`.
 
-## Run Locally
+## Getting Started
 
-**Prerequisites:**  Node.js
+### Installation
+Available directly via the interactive shell. Access the shell or embed it into your React/Vite project utilizing the `hypelang-docs` web playground.
 
+### Quick Example
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```hypelang
+// Create a flow to calculate factorial
+flow fact(n) {
+  match n {
+    when 0 yield 1
+    else yield n * fact(n - 1)
+  }
+}
+
+flow main() {
+  let result = fact(5)
+  print "Factorial of 5 is: " + result
+}
+```
+
+### Chart Generation Example
+
+```hypelang
+flow main() {
+  let xs = range(0, 100)
+  // Evaluate and graph!
+  lineChart(xs)
+}
+```
+
+## Running the Web Version
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+Navigate to the local address to run your scripts through the built-in parser and evaluated within the browser.

@@ -46,7 +46,7 @@ export class Interpreter {
 
   public async eval(program: Program, env: Map<string, Value>, expr: Expr): Promise<[Value, Map<string, Value>]> {
     const isBuiltinName = (name: string) =>
-      ["head", "tail", "cons", "len", "isEmpty", "append", "range", "map", "filter", "foldl", "force", "print"].includes(name);
+      ["head", "tail", "cons", "len", "isEmpty", "append", "range", "map", "filter", "foldl", "force", "print", "lineChart", "barChart", "scatterChart"].includes(name);
 
     const resolveVar = (name: string): [Value, Map<string, Value>] => {
       const v = env.get(name);
@@ -237,6 +237,11 @@ export class Interpreter {
       case "len": return { type: 'VInt', value: this.expectList(args[0]).length };
       case "isEmpty": return { type: 'VBool', value: this.expectList(args[0]).length === 0 };
       case "append": return { type: 'VList', value: [...this.expectList(args[0]), ...this.expectList(args[1])] };
+      case "lineChart":
+      case "barChart":
+      case "scatterChart":
+        this.options.print(`[HypeLang] Rendered ${name}: ${this.valueToString(args[0])}`);
+        return { type: 'VString', value: `<img>${name}</img>` };
       case "range": {
         const from = this.expectInt(args[0]);
         const to = this.expectInt(args[1]);

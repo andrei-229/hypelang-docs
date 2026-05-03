@@ -1,3 +1,4 @@
+// --- src/lib/aura/types.ts ---
 export type Pattern =
   | { type: 'PInt'; value: number }
   | { type: 'PBool'; value: boolean }
@@ -7,13 +8,11 @@ export type Pattern =
 export type Expr =
   | { type: 'Int'; value: number }
   | { type: 'Bool'; value: boolean }
-  | { type: 'Str'; value: string }
+  | { type: 'StringLit'; value: string }
   | { type: 'Var'; name: string }
   | { type: 'ListLit'; items: Expr[] }
   | { type: 'BinOp'; op: string; left: Expr; right: Expr }
   | { type: 'UnaryOp'; op: string; argument: Expr }
-  | { type: 'Lazy'; inner: Expr }
-  | { type: 'Lambda'; args: string[]; body: Expr }
   | { type: 'IfThenElse'; condition: Expr; thenBranch: Expr; elseBranch: Expr }
   | { type: 'Match'; target: Expr; cases: [Pattern, Expr][] }
   | { type: 'Call'; fn: Expr; args: Expr[] }
@@ -22,7 +21,9 @@ export type Expr =
   | { type: 'While'; condition: Expr; body: Expr }
   | { type: 'ForIn'; varName: string; iterable: Expr; body: Expr }
   | { type: 'Print'; inner: Expr }
-  | { type: 'Assign'; inner: Expr; name: string };
+  | { type: 'Assign'; inner: Expr; name: string }
+  | { type: 'Lazy'; inner: Expr }
+  | { type: 'Force'; inner: Expr };
 
 export interface FlowDef {
   name: string;
@@ -36,14 +37,10 @@ export interface Program {
 
 export type Token =
   | { type: 'TInt'; value: number }
-  | { type: 'TString'; value: string }
   | { type: 'TIdent'; value: string }
-  | { type: 'TFun' }
-  | { type: 'TNot' }
-  | { type: 'TLazy' }
+  | { type: 'TString'; value: string }
   | { type: 'TTrue' }
   | { type: 'TFalse' }
-  | { type: 'TArrow' }
   | { type: 'TLParen' }
   | { type: 'TRParen' }
   | { type: 'TLBracket' }
@@ -57,6 +54,6 @@ export type Value =
   | { type: 'VBool'; value: boolean }
   | { type: 'VString'; value: string }
   | { type: 'VList'; value: Value[] }
-  | { type: 'VThunk'; expr: Expr; env: Map<string, Value>; memo: { value: Value | null } }
   | { type: 'VClosure'; args: string[]; body: Expr; env: Map<string, Value> }
-  | { type: 'VBuiltin'; name: string };
+  | { type: 'VBuiltin'; fn: (args: Value[]) => Value }
+  | { type: 'VLazy'; expr: Expr; env: Map<string, Value>; cache: { value: Value | null } };
