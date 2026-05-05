@@ -491,12 +491,12 @@ ${H3('Comparison operators')}
 ${TABLE(
   ['Operator', 'Meaning', 'Example'],
   [
-    [MONO('=='), 'Equal to',             MONO('x == 5')],
-    [MONO('!='), 'Not equal to',         MONO('x != 0')],
-    [MONO('<'),  'Less than',            MONO('a < b')],
-    [MONO('>'),  'Greater than',         MONO('a > b')],
-    [MONO('<='), 'Less than or equal',   MONO('n <= 10')],
-    [MONO('>='), 'Greater than or equal',MONO('score >= 90')],
+    ['==', 'Equal to',             'x == 5'],
+    ['!=', 'Not equal to',         'x != 0'],
+    ['<',  'Less than',            'a < b'],
+    ['>',  'Greater than',         'a > b'],
+    ['<=', 'Less than or equal',   'n <= 10'],
+    ['>=', 'Greater than or equal','score >= 90'],
   ]
 )}
 `,
@@ -570,12 +570,12 @@ ${H3('Операторы сравнения')}
 ${TABLE(
   ['Оператор', 'Значение', 'Пример'],
   [
-    [MONO('=='), 'Равно',                  MONO('x == 5')],
-    [MONO('!='), 'Не равно',               MONO('x != 0')],
-    [MONO('<'),  'Меньше',                 MONO('a < b')],
-    [MONO('>'),  'Больше',                 MONO('a > b')],
-    [MONO('<='), 'Меньше или равно',       MONO('n <= 10')],
-    [MONO('>='), 'Больше или равно',       MONO('score >= 90')],
+    ['==', 'Равно',                  'x == 5'],
+    ['!=', 'Не равно',               'x != 0'],
+    ['<',  'Меньше',                 'a < b'],
+    ['>',  'Больше',                 'a > b'],
+    ['<=', 'Меньше или равно',       'n <= 10'],
+    ['>=', 'Больше или равно',       'score >= 90'],
   ]
 )}
 `
