@@ -11,48 +11,48 @@ self.MonacoEnvironment = { getWorker: () => new editorWorker() }
 // ── State ────────────────────────────────────────────────────
 const files = new Map()   // name → { model, unsaved }
 let activeFile = null
-let editor     = null
-let lang       = localStorage.getItem('hl-lang') || 'en'
+let editor = null
+let lang = localStorage.getItem('hl-lang') || 'en'
 
 // ── i18n strings ─────────────────────────────────────────────
 const I18N = {
   en: {
-    welcome:        'Welcome to HypeLang IDE',
-    welcomeSub:     'Open a file or start a new one',
-    newFile:        'New File',
-    openFile:       'Open File',
-    dropHint:       'Drop .hypelang / .hype / .hpl here',
-    docsTitle:      'Reference',
+    welcome: 'Welcome to HypeLang IDE',
+    welcomeSub: 'Open a file or start a new one',
+    newFile: 'New File',
+    openFile: 'Open File',
+    dropHint: 'Drop .hypelang / .hype / .hpl here',
+    docsTitle: 'Reference',
     searchPlaceholder: 'Search functions…',
-    noFiles:        'No open files',
-    sectionFn:      'Built-in Functions',
-    sectionKw:      'Keywords',
-    sectionOp:      'Operators',
+    noFiles: 'No open files',
+    sectionFn: 'Built-in Functions',
+    sectionKw: 'Keywords',
+    sectionOp: 'Operators',
     unsavedWarning: (n) => `"${n}" has unsaved changes. Close anyway?`,
-    saved:          (n) => `Saved ${n}`,
-    opened:         (n) => `Opened ${n}`,
-    onlyHype:       'Only .hypelang, .hype, .hpl files are supported',
-    saveAsPrompt:   'Save as:',
-    newFilePrompt:  'File name:',
+    saved: (n) => `Saved ${n}`,
+    opened: (n) => `Opened ${n}`,
+    onlyHype: 'Only .hypelang, .hype, .hpl files are supported',
+    saveAsPrompt: 'Save as:',
+    newFilePrompt: 'File name:',
   },
   ru: {
-    welcome:        'Добро пожаловать в HypeLang IDE',
-    welcomeSub:     'Откройте файл или создайте новый',
-    newFile:        'Новый файл',
-    openFile:       'Открыть файл',
-    dropHint:       'Перетащите .hypelang / .hype / .hpl сюда',
-    docsTitle:      'Справочник',
+    welcome: 'Добро пожаловать в HypeLang IDE',
+    welcomeSub: 'Откройте файл или создайте новый',
+    newFile: 'Новый файл',
+    openFile: 'Открыть файл',
+    dropHint: 'Перетащите .hypelang / .hype / .hpl сюда',
+    docsTitle: 'Справочник',
     searchPlaceholder: 'Поиск функций…',
-    noFiles:        'Нет открытых файлов',
-    sectionFn:      'Встроенные функции',
-    sectionKw:      'Ключевые слова',
-    sectionOp:      'Операторы',
+    noFiles: 'Нет открытых файлов',
+    sectionFn: 'Встроенные функции',
+    sectionKw: 'Ключевые слова',
+    sectionOp: 'Операторы',
     unsavedWarning: (n) => `"${n}" имеет несохранённые изменения. Всё равно закрыть?`,
-    saved:          (n) => `Сохранено: ${n}`,
-    opened:         (n) => `Открыто: ${n}`,
-    onlyHype:       'Поддерживаются только файлы .hypelang, .hype, .hpl',
-    saveAsPrompt:   'Сохранить как:',
-    newFilePrompt:  'Имя файла:',
+    saved: (n) => `Сохранено: ${n}`,
+    opened: (n) => `Открыто: ${n}`,
+    onlyHype: 'Поддерживаются только файлы .hypelang, .hype, .hpl',
+    saveAsPrompt: 'Сохранить как:',
+    newFilePrompt: 'Имя файла:',
   }
 }
 const t = (key, ...args) => {
@@ -64,11 +64,11 @@ const t = (key, ...args) => {
 const EXAMPLES = [
   {
     name: 'hello.hypelang',
-    label: { en: 'Hello World',      ru: 'Hello World' },
+    label: { en: 'Hello World', ru: 'Hello World' },
     icon: '👋',
-    desc:  { en: 'First program',    ru: 'Первая программа' },
+    desc: { en: 'First program', ru: 'Первая программа' },
     code:
-`-- Hello World in HypeLang
+      `-- Hello World in HypeLang
 flow greet name {
     "Hello, " + name + "!"
 }
@@ -81,11 +81,11 @@ flow main {
   },
   {
     name: 'factorial.hypelang',
-    label: { en: 'Factorial',        ru: 'Факториал' },
+    label: { en: 'Factorial', ru: 'Факториал' },
     icon: '🔢',
-    desc:  { en: 'Recursive + match', ru: 'Рекурсия + match' },
+    desc: { en: 'Recursive + match', ru: 'Рекурсия + match' },
     code:
-`-- Recursive factorial using pattern matching
+      `-- Recursive factorial using pattern matching
 flow fact n {
     match n {
         0 -> 1;
@@ -102,11 +102,11 @@ flow main {
   },
   {
     name: 'lists.hypelang',
-    label: { en: 'List Operations',  ru: 'Списки' },
+    label: { en: 'List Operations', ru: 'Списки' },
     icon: '📋',
-    desc:  { en: 'map, reduce, head', ru: 'map, reduce, head' },
+    desc: { en: 'map, reduce, head', ru: 'map, reduce, head' },
     code:
-`-- List operations demo
+      `-- List operations demo
 flow double x { x * 2 }
 flow add a b  { a + b  }
 
@@ -130,11 +130,11 @@ flow main {
   },
   {
     name: 'lazy.hypelang',
-    label: { en: 'Lazy Evaluation',  ru: 'Ленивые вычисления' },
+    label: { en: 'Lazy Evaluation', ru: 'Ленивые вычисления' },
     icon: '💤',
-    desc:  { en: 'lazy / force',     ru: 'lazy / force' },
+    desc: { en: 'lazy / force', ru: 'lazy / force' },
     code:
-`-- Lazy evaluation demo
+      `-- Lazy evaluation demo
 flow cube x { x * x * x }
 
 flow main {
@@ -149,11 +149,11 @@ flow main {
   },
   {
     name: 'charts.hypelang',
-    label: { en: 'Charts',           ru: 'Графики' },
+    label: { en: 'Charts', ru: 'Графики' },
     icon: '📊',
-    desc:  { en: 'plot, bar, scatter', ru: 'plot, bar, scatter' },
+    desc: { en: 'plot, bar, scatter', ru: 'plot, bar, scatter' },
     code:
-`-- Charting demo — opens in browser
+      `-- Charting demo — opens in browser
 flow square x { x * x }
 
 flow main {
@@ -176,11 +176,11 @@ flow main {
   },
   {
     name: 'loops.hypelang',
-    label: { en: 'Loops',            ru: 'Циклы' },
+    label: { en: 'Loops', ru: 'Циклы' },
     icon: '🔄',
-    desc:  { en: 'while, for, when', ru: 'while, for, when' },
+    desc: { en: 'while, for, when', ru: 'while, for, when' },
     code:
-`-- Loops and conditionals
+      `-- Loops and conditionals
 flow main {
     -- for-in loop
     let nums = [1, 2, 3, 4, 5]
@@ -283,7 +283,7 @@ function saveFile() {
 
 function saveFileAs() {
   if (!activeFile) return
-  const ext  = activeFile.split('.').pop()
+  const ext = activeFile.split('.').pop()
   const base = activeFile.replace(/\.[^.]+$/, '')
   const name = prompt(t('saveAsPrompt'), `${base}_copy.${ext}`)
   if (!name) return
@@ -301,7 +301,7 @@ function promptNewFile() {
   const name = prompt(t('newFilePrompt'), 'untitled.hypelang')
   if (!name) return
   const ext = name.split('.').pop().toLowerCase()
-  const finalName = ['hypelang','hype','hpl'].includes(ext) ? name : name + '.hypelang'
+  const finalName = ['hypelang', 'hype', 'hpl'].includes(ext) ? name : name + '.hypelang'
   newFile(finalName, `-- ${finalName}\n\nflow main {\n    \n}\n`)
 }
 
@@ -349,7 +349,7 @@ function renderFileTree() {
     return
   }
   for (const [name] of files) {
-    const ext  = name.split('.').pop()
+    const ext = name.split('.').pop()
     const item = document.createElement('div')
     item.className = 'tree-item' + (name === activeFile ? ' active' : '')
     item.innerHTML = `${fileIcon()}<span>${escHtml(name)}</span><span class="ext-badge">.${ext}</span>`
@@ -439,10 +439,10 @@ function buildWelcomeGrid() {
     grid.appendChild(card)
   }
 
-  document.querySelector('.placeholder-title').textContent   = t('welcome')
-  document.querySelector('.placeholder-sub').textContent     = t('welcomeSub')
-  document.getElementById('btn-welcome-new').textContent     = t('newFile')
-  document.getElementById('btn-welcome-open').textContent    = t('openFile')
+  document.querySelector('.placeholder-title').textContent = t('welcome')
+  document.querySelector('.placeholder-sub').textContent = t('welcomeSub')
+  document.getElementById('btn-welcome-new').textContent = t('newFile')
+  document.getElementById('btn-welcome-open').textContent = t('openFile')
   document.getElementById('drop-hint').querySelector('span').textContent = t('dropHint')
 }
 
@@ -474,20 +474,17 @@ function setLang(newLang) {
 
 // ── Status updates ────────────────────────────────────────────
 function updateStatusFile(name) { document.getElementById('status-file').textContent = name }
-function updateStatusPos(pos)   { document.getElementById('status-pos').textContent = `Ln ${pos.lineNumber}, Col ${pos.column}` }
+function updateStatusPos(pos) { document.getElementById('status-pos').textContent = `Ln ${pos.lineNumber}, Col ${pos.column}` }
 
 // ── Guide ─────────────────────────────────────────────────────
-let guideOpen        = false
-let guideActiveSec   = GUIDE_SECTIONS[0].id
+let guideOpen = false
+let guideActiveSec = GUIDE_SECTIONS[0].id
 
 function openGuide(sectionId) {
   guideOpen = true
   document.getElementById('guide-overlay').classList.remove('hidden')
   document.getElementById('btn-open-guide').classList.add('active')
   renderGuide(sectionId || guideActiveSec)
-  // sync lang buttons inside guide
-  document.getElementById('guide-lang-en').classList.toggle('active', lang === 'en')
-  document.getElementById('guide-lang-ru').classList.toggle('active', lang === 'ru')
 }
 
 function closeGuide() {
@@ -521,7 +518,7 @@ function renderGuide(sectionId) {
 }
 
 // ── Panels ────────────────────────────────────────────────────
-let docsOpen    = false
+let docsOpen = false
 let sidebarOpen = true
 
 function toggleDocs() {
@@ -558,14 +555,14 @@ function setupDragDrop() {
   })
 
   // Prevent browser from navigating on accidental drops elsewhere
-  document.addEventListener('dragover',  e => e.preventDefault())
-  document.addEventListener('drop',      e => e.preventDefault())
+  document.addEventListener('dragover', e => e.preventDefault())
+  document.addEventListener('drop', e => e.preventDefault())
 }
 
 // ── Helpers ───────────────────────────────────────────────────
 function escHtml(str) {
   return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 function mdToHtml(text) {
@@ -575,31 +572,32 @@ function mdToHtml(text) {
     .replace(/\n/g, '<br>')
 }
 
+
 // ── Init ──────────────────────────────────────────────────────
 function init() {
   registerHypeLang(monaco)
   monaco.editor.defineTheme('hypelang-dark', HYPELANG_THEME)
 
   editor = monaco.editor.create(document.getElementById('monaco-editor'), {
-    theme:    'hypelang-dark',
+    theme: 'hypelang-dark',
     language: 'hypelang',
     fontSize: 14,
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace",
-    fontLigatures:  true,
-    lineNumbers:    'on',
-    minimap:        { enabled: true },
+    fontLigatures: true,
+    lineNumbers: 'on',
+    minimap: { enabled: true },
     scrollBeyondLastLine: false,
-    automaticLayout:  true,
-    tabSize:          4,
-    insertSpaces:     true,
-    wordWrap:         'off',
+    automaticLayout: true,
+    tabSize: 4,
+    insertSpaces: true,
+    wordWrap: 'off',
     bracketPairColorization: { enabled: true },
-    smoothScrolling:  true,
+    smoothScrolling: true,
     cursorSmoothCaretAnimation: 'on',
     renderWhitespace: 'selection',
     quickSuggestions: { other: true, comments: false, strings: false },
-    parameterHints:   { enabled: true },
-    padding:          { top: 16, bottom: 16 },
+    parameterHints: { enabled: true },
+    padding: { top: 16, bottom: 16 },
   })
 
   registerCompletions(monaco)
@@ -631,18 +629,6 @@ function init() {
   document.getElementById('btn-close-guide').addEventListener('click', closeGuide)
   document.getElementById('guide-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('guide-overlay')) closeGuide()
-  })
-  document.getElementById('guide-lang-en').addEventListener('click', () => {
-    setLang('en')
-    document.getElementById('guide-lang-en').classList.add('active')
-    document.getElementById('guide-lang-ru').classList.remove('active')
-    if (guideOpen) renderGuide()
-  })
-  document.getElementById('guide-lang-ru').addEventListener('click', () => {
-    setLang('ru')
-    document.getElementById('guide-lang-ru').classList.add('active')
-    document.getElementById('guide-lang-en').classList.remove('active')
-    if (guideOpen) renderGuide()
   })
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && guideOpen) closeGuide()

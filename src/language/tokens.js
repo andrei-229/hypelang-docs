@@ -43,7 +43,7 @@ export function registerHypeLang(monaco) {
           cases: {
             '@keywords': 'keyword',
             '@builtins': 'builtin',
-            '@default':  'identifier'
+            '@default': 'identifier'
           }
         }],
 

@@ -2,95 +2,95 @@
 
 // ── Syntax highlighter for guide code blocks ──────────────────
 function esc(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 export function hlCode(raw) {
-  const KW = new Set(['flow','let','when','else','while','for','use','match','print','lazy','force','true','false'])
-  const FN = new Set(['len','head','tail','push','map','reduce','readFile','writeFile','plot','plotXY','barChart','scatter'])
-  const out = []
-  const code = raw.replace(/^\n/, '')   // trim leading newline from template literals
-  let i = 0
+    const KW = new Set(['flow', 'let', 'when', 'else', 'while', 'for', 'use', 'match', 'print', 'lazy', 'force', 'true', 'false'])
+    const FN = new Set(['len', 'head', 'tail', 'push', 'map', 'reduce', 'readFile', 'writeFile', 'plot', 'plotXY', 'barChart', 'scatter'])
+    const out = []
+    const code = raw.replace(/^\n/, '')   // trim leading newline from template literals
+    let i = 0
 
-  while (i < code.length) {
-    const ch = code[i]
+    while (i < code.length) {
+        const ch = code[i]
 
-    if (ch === '\n') { out.push('\n'); i++; continue }
+        if (ch === '\n') { out.push('\n'); i++; continue }
 
-    // comment: -- or //
-    if ((ch === '-' && code[i+1] === '-') || (ch === '/' && code[i+1] === '/')) {
-      let j = i
-      while (j < code.length && code[j] !== '\n') j++
-      out.push(`<span class="hl-cm">${esc(code.slice(i, j))}</span>`)
-      i = j; continue
+        // comment: -- or //
+        if ((ch === '-' && code[i + 1] === '-') || (ch === '/' && code[i + 1] === '/')) {
+            let j = i
+            while (j < code.length && code[j] !== '\n') j++
+            out.push(`<span class="hl-cm">${esc(code.slice(i, j))}</span>`)
+            i = j; continue
+        }
+
+        // string
+        if (ch === '"') {
+            let j = i + 1
+            while (j < code.length && code[j] !== '"' && code[j] !== '\n') {
+                if (code[j] === '\\') j++
+                j++
+            }
+            if (j < code.length && code[j] === '"') j++
+            out.push(`<span class="hl-str">${esc(code.slice(i, j))}</span>`)
+            i = j; continue
+        }
+
+        // number (not preceded by word char)
+        if (/\d/.test(ch) && (i === 0 || !/\w/.test(code[i - 1]))) {
+            let j = i
+            while (j < code.length && /\d/.test(code[j])) j++
+            out.push(`<span class="hl-num">${code.slice(i, j)}</span>`)
+            i = j; continue
+        }
+
+        // identifier / keyword / builtin
+        if (/[a-zA-Z_]/.test(ch)) {
+            let j = i
+            while (j < code.length && /\w/.test(code[j])) j++
+            const w = code.slice(i, j)
+            if (KW.has(w)) out.push(`<span class="hl-kw">${w}</span>`)
+            else if (FN.has(w)) out.push(`<span class="hl-fn">${w}</span>`)
+            else out.push(esc(w))
+            i = j; continue
+        }
+
+        // multi-char operators
+        const mop = ['->', '++', '+=', '==', '!=', '<=', '>='].find(o => code.startsWith(o, i))
+        if (mop) {
+            out.push(`<span class="hl-op">${esc(mop)}</span>`)
+            i += mop.length; continue
+        }
+
+        // single-char operators
+        if ('+-*/<>=!'.includes(ch)) {
+            out.push(`<span class="hl-op">${esc(ch)}</span>`)
+            i++; continue
+        }
+
+        out.push(esc(ch)); i++
     }
-
-    // string
-    if (ch === '"') {
-      let j = i + 1
-      while (j < code.length && code[j] !== '"' && code[j] !== '\n') {
-        if (code[j] === '\\') j++
-        j++
-      }
-      if (j < code.length && code[j] === '"') j++
-      out.push(`<span class="hl-str">${esc(code.slice(i, j))}</span>`)
-      i = j; continue
-    }
-
-    // number (not preceded by word char)
-    if (/\d/.test(ch) && (i === 0 || !/\w/.test(code[i-1]))) {
-      let j = i
-      while (j < code.length && /\d/.test(code[j])) j++
-      out.push(`<span class="hl-num">${code.slice(i, j)}</span>`)
-      i = j; continue
-    }
-
-    // identifier / keyword / builtin
-    if (/[a-zA-Z_]/.test(ch)) {
-      let j = i
-      while (j < code.length && /\w/.test(code[j])) j++
-      const w = code.slice(i, j)
-      if (KW.has(w))      out.push(`<span class="hl-kw">${w}</span>`)
-      else if (FN.has(w)) out.push(`<span class="hl-fn">${w}</span>`)
-      else                out.push(esc(w))
-      i = j; continue
-    }
-
-    // multi-char operators
-    const mop = ['->','++','+=','==','!=','<=','>='].find(o => code.startsWith(o, i))
-    if (mop) {
-      out.push(`<span class="hl-op">${esc(mop)}</span>`)
-      i += mop.length; continue
-    }
-
-    // single-char operators
-    if ('+-*/<>=!'.includes(ch)) {
-      out.push(`<span class="hl-op">${esc(ch)}</span>`)
-      i++; continue
-    }
-
-    out.push(esc(ch)); i++
-  }
-  return out.join('')
+    return out.join('')
 }
 
 // ── HTML micro-helpers ─────────────────────────────────────────
-const H2   = t => `<h2 class="g-h2">${t}</h2>`
-const H3   = t => `<h3 class="g-h3">${t}</h3>`
-const P    = t => `<p class="g-p">${t}</p>`
-const UL   = items => `<ul class="g-ul">${items.map(i => `<li>${i}</li>`).join('')}</ul>`
+const H2 = t => `<h2 class="g-h2">${t}</h2>`
+const H3 = t => `<h3 class="g-h3">${t}</h3>`
+const P = t => `<p class="g-p">${t}</p>`
+const UL = items => `<ul class="g-ul">${items.map(i => `<li>${i}</li>`).join('')}</ul>`
 const CODE = (src, lbl = '') =>
-  `<div class="g-code-wrap">${lbl ? `<div class="g-code-lbl">${lbl}</div>` : ''}<pre class="g-code">${hlCode(src)}</pre></div>`
+    `<div class="g-code-wrap">${lbl ? `<div class="g-code-lbl">${lbl}</div>` : ''}<pre class="g-code">${hlCode(src)}</pre></div>`
 const NOTE = t => `<div class="g-callout note"><span class="g-ci">ℹ</span><div>${t}</div></div>`
-const TIP  = t => `<div class="g-callout tip"><span class="g-ci">💡</span><div>${t}</div></div>`
+const TIP = t => `<div class="g-callout tip"><span class="g-ci">💡</span><div>${t}</div></div>`
 const WARN = t => `<div class="g-callout warn"><span class="g-ci">⚠</span><div>${t}</div></div>`
-const KBD  = k => `<kbd class="g-kbd">${k}</kbd>`
-const MONO = t => `<code class="g-inline">${t}</code>`
+const KBD = k => `<kbd class="g-kbd">${esc(k)}</kbd>`
+const MONO = t => `<code class="g-inline">${esc(t)}</code>`
 
 function TABLE(heads, rows) {
-  const ths = heads.map(h => `<th>${h}</th>`).join('')
-  const trs = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')
-  return `<table class="g-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`
+    const ths = heads.map(h => `<th>${h}</th>`).join('')
+    const trs = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')
+    return `<table class="g-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -99,7 +99,7 @@ function TABLE(heads, rows) {
 
 // ── 1. Introduction ───────────────────────────────────────────
 const intro = {
-  en: () => `
+    en: () => `
 ${H2('Introduction to HypeLang')}
 ${P('HypeLang is a small, expressive functional programming language. It is dynamically typed, expression-based, and supports first-class functions, pattern matching, and lazy evaluation. Programs are run by the interpreter written in F#.')}
 ${H3('How to run a program')}
@@ -126,7 +126,7 @@ ${H3('Running in the IDE')}
 ${P('The web IDE is for writing and editing files only. To execute code, save the file and run it with the terminal command above, or use the VS Code extension which adds a ' + KBD('Ctrl+F5') + ' shortcut.')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Введение в HypeLang')}
 ${P('HypeLang — небольшой выразительный функциональный язык программирования. Он динамически типизирован, основан на выражениях и поддерживает функции первого класса, сопоставление с образцом и ленивые вычисления. Программы запускаются интерпретатором, написанным на F#.')}
 ${H3('Как запустить программу')}
@@ -156,7 +156,7 @@ ${P('Веб-IDE предназначена только для написани�
 
 // ── 2. Variables & Types ──────────────────────────────────────
 const variables = {
-  en: () => `
+    en: () => `
 ${H2('Variables & Types')}
 ${P('Variables in HypeLang are created with the ' + MONO('let') + ' keyword. They are immutable bindings by default — once bound, a name refers to the same value for the rest of its scope. (Mutable assignment is possible with ' + MONO('->') + ' and ' + MONO('+=') + ' — see the Operators section.)')}
 ${H3('let — binding a value')}
@@ -175,14 +175,14 @@ flow main {
 `)}
 ${H3('Types at a glance')}
 ${TABLE(
-  ['Type', 'Examples', 'Description'],
-  [
-    ['Integer', MONO('0  42  -7'), 'Whole numbers'],
-    ['Boolean', MONO('true  false'), 'Logical values'],
-    ['String',  MONO('"hello"  "Hi!"'), 'Text, enclosed in double quotes'],
-    ['List',    MONO('[1, 2, 3]  ["a", "b"]'), 'Ordered sequences of any values'],
-  ]
-)}
+        ['Type', 'Examples', 'Description'],
+        [
+            ['Integer', MONO('0  42  -7'), 'Whole numbers'],
+            ['Boolean', MONO('true  false'), 'Logical values'],
+            ['String', MONO('"hello"  "Hi!"'), 'Text, enclosed in double quotes'],
+            ['List', MONO('[1, 2, 3]  ["a", "b"]'), 'Ordered sequences of any values'],
+        ]
+    )}
 ${H3('String operations')}
 ${P('Strings can be concatenated with ' + MONO('+') + ':')}
 ${CODE(`
@@ -206,7 +206,7 @@ flow main {
 ${TIP('You can print expressions directly without binding them to a variable: <code class="g-inline">print 2 + 2</code>')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Переменные и типы')}
 ${P('Переменные в HypeLang создаются ключевым словом ' + MONO('let') + '. По умолчанию это неизменяемые привязки — после создания имя всегда ссылается на одно и то же значение в своей области видимости. (Изменяемое присваивание возможно через ' + MONO('->') + ' и ' + MONO('+=') + ' — см. раздел об операторах.)')}
 ${H3('let — привязка значения')}
@@ -225,14 +225,14 @@ flow main {
 `)}
 ${H3('Типы данных')}
 ${TABLE(
-  ['Тип', 'Примеры', 'Описание'],
-  [
-    ['Integer (целое)', MONO('0  42  -7'), 'Целые числа'],
-    ['Boolean (логический)', MONO('true  false'), 'Логические значения'],
-    ['String (строка)',  MONO('"hello"  "Привет"'), 'Текст в двойных кавычках'],
-    ['List (список)',    MONO('[1, 2, 3]  ["a", "b"]'), 'Упорядоченные последовательности любых значений'],
-  ]
-)}
+        ['Тип', 'Примеры', 'Описание'],
+        [
+            ['Integer (целое)', MONO('0  42  -7'), 'Целые числа'],
+            ['Boolean (логический)', MONO('true  false'), 'Логические значения'],
+            ['String (строка)', MONO('"hello"  "Привет"'), 'Текст в двойных кавычках'],
+            ['List (список)', MONO('[1, 2, 3]  ["a", "b"]'), 'Упорядоченные последовательности любых значений'],
+        ]
+    )}
 ${H3('Работа со строками')}
 ${P('Строки объединяются оператором ' + MONO('+') + ':')}
 ${CODE(`
@@ -259,7 +259,7 @@ ${TIP('Можно выводить выражения без привязки к
 
 // ── 3. Functions ──────────────────────────────────────────────
 const functions = {
-  en: () => `
+    en: () => `
 ${H2('Functions')}
 ${P('Functions are defined with the ' + MONO('flow') + ' keyword. They are the primary building block in HypeLang. The value of the last expression in the function body is automatically returned.')}
 ${H3('Basic definition')}
@@ -339,7 +339,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Функции')}
 ${P('Функции определяются ключевым словом ' + MONO('flow') + '. Они являются основным строительным блоком HypeLang. Значение последнего выражения в теле функции автоматически возвращается.')}
 ${H3('Базовое определение')}
@@ -422,7 +422,7 @@ flow main {
 
 // ── 4. Conditionals ───────────────────────────────────────────
 const conditionals = {
-  en: () => `
+    en: () => `
 ${H2('Conditionals')}
 ${P('HypeLang uses the ' + MONO('when') + ' keyword for conditional branching, with an optional ' + MONO('else') + ' block.')}
 ${H3('when / else')}
@@ -489,19 +489,19 @@ flow main {
 `)}
 ${H3('Comparison operators')}
 ${TABLE(
-  ['Operator', 'Meaning', 'Example'],
-  [
-    ['==', 'Equal to',             'x == 5'],
-    ['!=', 'Not equal to',         'x != 0'],
-    ['<',  'Less than',            'a < b'],
-    ['>',  'Greater than',         'a > b'],
-    ['<=', 'Less than or equal',   'n <= 10'],
-    ['>=', 'Greater than or equal','score >= 90'],
-  ]
-)}
+        ['Operator', 'Meaning', 'Example'],
+        [
+            [MONO('=='), 'Equal to', MONO('x == 5')],
+            [MONO('!='), 'Not equal to', MONO('x != 0')],
+            [MONO('<'), 'Less than', MONO('a < b')],
+            [MONO('>'), 'Greater than', MONO('a > b')],
+            [MONO('<='), 'Less than or equal', MONO('n <= 10')],
+            [MONO('>='), 'Greater than or equal', MONO('score >= 90')],
+        ]
+    )}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Условия')}
 ${P('В HypeLang используется ключевое слово ' + MONO('when') + ' для условного ветвления, с необязательным блоком ' + MONO('else') + '.')}
 ${H3('when / else')}
@@ -568,22 +568,22 @@ flow main {
 `)}
 ${H3('Операторы сравнения')}
 ${TABLE(
-  ['Оператор', 'Значение', 'Пример'],
-  [
-    ['==', 'Равно',                  'x == 5'],
-    ['!=', 'Не равно',               'x != 0'],
-    ['<',  'Меньше',                 'a < b'],
-    ['>',  'Больше',                 'a > b'],
-    ['<=', 'Меньше или равно',       'n <= 10'],
-    ['>=', 'Больше или равно',       'score >= 90'],
-  ]
-)}
+        ['Оператор', 'Значение', 'Пример'],
+        [
+            [MONO('=='), 'Равно', MONO('x == 5')],
+            [MONO('!='), 'Не равно', MONO('x != 0')],
+            [MONO('<'), 'Меньше', MONO('a < b')],
+            [MONO('>'), 'Больше', MONO('a > b')],
+            [MONO('<='), 'Меньше или равно', MONO('n <= 10')],
+            [MONO('>='), 'Больше или равно', MONO('score >= 90')],
+        ]
+    )}
 `
 }
 
 // ── 5. Pattern Matching ───────────────────────────────────────
 const patternMatching = {
-  en: () => `
+    en: () => `
 ${H2('Pattern Matching')}
 ${P(MONO('match') + ' is a powerful alternative to nested ' + MONO('when') + ' chains. It tests a value against a series of patterns and evaluates the first matching branch.')}
 ${H3('Basic syntax')}
@@ -668,7 +668,7 @@ flow main {
 ${WARN('Every <code class="g-inline">match</code> branch must end with a semicolon <code class="g-inline">;</code>')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Сопоставление с образцом')}
 ${P(MONO('match') + ' — мощная альтернатива цепочкам вложенных ' + MONO('when') + '. Он проверяет значение по набору образцов и вычисляет первую подходящую ветвь.')}
 ${H3('Базовый синтаксис')}
@@ -756,7 +756,7 @@ ${WARN('Каждая ветвь <code class="g-inline">match</code> должна
 
 // ── 6. Loops ──────────────────────────────────────────────────
 const loops = {
-  en: () => `
+    en: () => `
 ${H2('Loops')}
 ${P('HypeLang has two loop constructs: ' + MONO('while') + ' for condition-based repetition and ' + MONO('for...use') + ' for iterating over lists.')}
 ${H3('while loop')}
@@ -797,13 +797,13 @@ flow main {
 ${H3('Mutable variables')}
 ${P('Inside loops you often need to update a variable. HypeLang provides:')}
 ${TABLE(
-  ['Syntax', 'Meaning', 'Example'],
-  [
-    [MONO('x++'),    'Increment x by 1',  MONO('i++')],
-    [MONO('x += n'), 'Add n to x',        MONO('sum += n')],
-    [MONO('expr -> x'), 'Assign expr to x', MONO('x * 2 -> x')],
-  ]
-)}
+        ['Syntax', 'Meaning', 'Example'],
+        [
+            [MONO('x++'), 'Increment x by 1', MONO('i++')],
+            [MONO('x += n'), 'Add n to x', MONO('sum += n')],
+            [MONO('expr -> x'), 'Assign expr to x', MONO('x * 2 -> x')],
+        ]
+    )}
 ${H3('while with a flag')}
 ${CODE(`
 flow main {
@@ -841,7 +841,7 @@ flow main {
 ${TIP('Prefer <code class="g-inline">for...use</code> over <code class="g-inline">while</code> whenever you iterate over a list — it is cleaner and less error-prone.')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Циклы')}
 ${P('В HypeLang есть два вида циклов: ' + MONO('while') + ' для повторения по условию и ' + MONO('for...use') + ' для перебора списков.')}
 ${H3('Цикл while')}
@@ -882,13 +882,13 @@ flow main {
 ${H3('Изменяемые переменные')}
 ${P('Внутри циклов часто нужно обновлять переменную. HypeLang предоставляет:')}
 ${TABLE(
-  ['Синтаксис', 'Смысл', 'Пример'],
-  [
-    [MONO('x++'),    'Увеличить x на 1',  MONO('i++')],
-    [MONO('x += n'), 'Прибавить n к x',   MONO('sum += n')],
-    [MONO('expr -> x'), 'Присвоить expr к x', MONO('x * 2 -> x')],
-  ]
-)}
+        ['Синтаксис', 'Смысл', 'Пример'],
+        [
+            [MONO('x++'), 'Увеличить x на 1', MONO('i++')],
+            [MONO('x += n'), 'Прибавить n к x', MONO('sum += n')],
+            [MONO('expr -> x'), 'Присвоить expr к x', MONO('x * 2 -> x')],
+        ]
+    )}
 ${H3('Вложенные циклы')}
 ${CODE(`
 flow main {
@@ -907,7 +907,7 @@ ${TIP('Используйте <code class="g-inline">for...use</code> вмест
 
 // ── 7. Lists ──────────────────────────────────────────────────
 const lists = {
-  en: () => `
+    en: () => `
 ${H2('Lists')}
 ${P('Lists are the core data structure of HypeLang. They hold an ordered sequence of values. Elements can be of any type, even mixed.')}
 ${H3('Creating lists')}
@@ -1000,7 +1000,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Списки')}
 ${P('Списки — основная структура данных HypeLang. Они хранят упорядоченные последовательности значений. Элементы могут быть любого типа, в том числе смешанного.')}
 ${H3('Создание списков')}
@@ -1096,7 +1096,7 @@ flow main {
 
 // ── 8. Recursion ──────────────────────────────────────────────
 const recursion = {
-  en: () => `
+    en: () => `
 ${H2('Recursion')}
 ${P('In a functional language, recursion takes the place of loops for many algorithms. A recursive function calls itself with a smaller input until it reaches a base case.')}
 ${H3('Anatomy of a recursive function')}
@@ -1193,7 +1193,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Рекурсия')}
 ${P('В функциональном языке рекурсия заменяет циклы во многих алгоритмах. Рекурсивная функция вызывает саму себя с меньшим аргументом, пока не достигнет базового случая.')}
 ${H3('Строение рекурсивной функции')}
@@ -1293,7 +1293,7 @@ flow main {
 
 // ── 9. Higher-Order Functions ─────────────────────────────────
 const higherOrder = {
-  en: () => `
+    en: () => `
 ${H2('Higher-Order Functions')}
 ${P('A higher-order function (HOF) is one that takes other functions as arguments or returns a function. This is one of the most powerful patterns in functional programming.')}
 ${H3('Passing functions as arguments')}
@@ -1388,7 +1388,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Функции высшего порядка')}
 ${P('Функция высшего порядка (ФВП) — это функция, принимающая другие функции как аргументы или возвращающая функцию. Это один из мощнейших паттернов функционального программирования.')}
 ${H3('Передача функций как аргументов')}
@@ -1452,7 +1452,7 @@ flow main {
 
 // ── 10. Lazy Evaluation ───────────────────────────────────────
 const lazyEval = {
-  en: () => `
+    en: () => `
 ${H2('Lazy Evaluation')}
 ${P('Normally HypeLang evaluates expressions immediately (eager evaluation). With ' + MONO('lazy') + ', you can defer evaluation until the value is actually needed.')}
 ${H3('lazy and force')}
@@ -1479,11 +1479,11 @@ flow main {
 ${NOTE('A <code class="g-inline">lazy</code> expression is evaluated at most once. The result is cached after the first <code class="g-inline">force</code>.')}
 ${H3('When to use lazy')}
 ${UL([
-  'Expensive computations that may not be needed at all',
-  'Breaking circular dependencies between values',
-  'Simulating infinite or very large data structures',
-  'Delaying side effects (file I/O, etc.)',
-])}
+        'Expensive computations that may not be needed at all',
+        'Breaking circular dependencies between values',
+        'Simulating infinite or very large data structures',
+        'Delaying side effects (file I/O, etc.)',
+    ])}
 ${H3('Lazy in a conditional')}
 ${CODE(`
 flow bigCompute x { x * x * x }
@@ -1513,7 +1513,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Ленивые вычисления')}
 ${P('Обычно HypeLang вычисляет выражения немедленно (энергичные вычисления). С ключевым словом ' + MONO('lazy') + ' можно отложить вычисление до момента, когда значение действительно потребуется.')}
 ${H3('lazy и force')}
@@ -1540,11 +1540,11 @@ flow main {
 ${NOTE('Выражение <code class="g-inline">lazy</code> вычисляется не более одного раза. Результат кэшируется после первого <code class="g-inline">force</code>.')}
 ${H3('Когда использовать lazy')}
 ${UL([
-  'Дорогостоящие вычисления, которые могут вообще не понадобиться',
-  'Разрыв циклических зависимостей между значениями',
-  'Симуляция бесконечных или очень больших структур данных',
-  'Откладывание побочных эффектов (файловый ввод-вывод и т.д.)',
-])}
+        'Дорогостоящие вычисления, которые могут вообще не понадобиться',
+        'Разрыв циклических зависимостей между значениями',
+        'Симуляция бесконечных или очень больших структур данных',
+        'Откладывание побочных эффектов (файловый ввод-вывод и т.д.)',
+    ])}
 ${H3('Lazy в условии')}
 ${CODE(`
 flow bigCompute x { x * x * x }
@@ -1567,7 +1567,7 @@ flow main {
 
 // ── 11. File I/O ──────────────────────────────────────────────
 const fileIO = {
-  en: () => `
+    en: () => `
 ${H2('File I/O')}
 ${P('HypeLang can read from and write to files using two built-in functions. Paths are relative to the directory from which you run the interpreter.')}
 ${H3('readFile')}
@@ -1598,7 +1598,7 @@ flow main {
 ${WARN('File paths are resolved relative to the working directory when you run the interpreter, not relative to the source file.')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Файловый ввод-вывод')}
 ${P('HypeLang может читать файлы и записывать в них с помощью двух встроенных функций. Пути задаются относительно директории, из которой запускается интерпретатор.')}
 ${H3('readFile')}
@@ -1632,7 +1632,7 @@ ${WARN('Пути к файлам разрешаются относительно
 
 // ── 12. Charts ────────────────────────────────────────────────
 const charts = {
-  en: () => `
+    en: () => `
 ${H2('Data Visualization')}
 ${P('HypeLang has four built-in charting functions. Each generates an HTML/SVG file and automatically opens it in your default browser.')}
 ${H3('plot — line chart with auto X axis')}
@@ -1698,7 +1698,7 @@ flow main {
 ${NOTE('Each chart call opens a new browser tab. Run the program once to generate all charts together.')}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Визуализация данных')}
 ${P('В HypeLang есть четыре встроенных функции для построения графиков. Каждая создаёт HTML/SVG файл и автоматически открывает его в браузере по умолчанию.')}
 ${H3('plot — линейный график с автоматической осью X')}
@@ -1752,58 +1752,58 @@ ${NOTE('Каждый вызов функции графика открывает
 
 // ── 13. Operators ─────────────────────────────────────────────
 const operators = {
-  en: () => `
+    en: () => `
 ${H2('Operators Reference')}
 ${H3('Arithmetic')}
 ${TABLE(
-  ['Operator', 'Meaning', 'Example', 'Result'],
-  [
-    [MONO('+'), 'Addition',       MONO('3 + 4'),  MONO('7')],
-    [MONO('-'), 'Subtraction',    MONO('10 - 3'), MONO('7')],
-    [MONO('*'), 'Multiplication', MONO('3 * 4'),  MONO('12')],
-    [MONO('/'), 'Integer division',MONO('10 / 3'),MONO('3')],
-  ]
-)}
+        ['Operator', 'Meaning', 'Example', 'Result'],
+        [
+            [MONO('+'), 'Addition', MONO('3 + 4'), MONO('7')],
+            [MONO('-'), 'Subtraction', MONO('10 - 3'), MONO('7')],
+            [MONO('*'), 'Multiplication', MONO('3 * 4'), MONO('12')],
+            [MONO('/'), 'Integer division', MONO('10 / 3'), MONO('3')],
+        ]
+    )}
 ${NOTE('HypeLang uses integer arithmetic. Division truncates toward zero: <code class="g-inline">7 / 2 = 3</code>, not 3.5.')}
 ${H3('Comparison')}
 ${TABLE(
-  ['Operator', 'Meaning', 'Example'],
-  [
-    [MONO('=='), 'Equal',               MONO('x == 5')],
-    [MONO('!='), 'Not equal',           MONO('x != 0')],
-    [MONO('<'),  'Less than',           MONO('a < b')],
-    [MONO('>'),  'Greater than',        MONO('a > b')],
-    [MONO('<='), 'Less than or equal',  MONO('n <= 10')],
-    [MONO('>='), 'Greater than or equal',MONO('score >= 60')],
-  ]
-)}
+        ['Operator', 'Meaning', 'Example'],
+        [
+            [MONO('=='), 'Equal', MONO('x == 5')],
+            [MONO('!='), 'Not equal', MONO('x != 0')],
+            [MONO('<'), 'Less than', MONO('a < b')],
+            [MONO('>'), 'Greater than', MONO('a > b')],
+            [MONO('<='), 'Less than or equal', MONO('n <= 10')],
+            [MONO('>='), 'Greater than or equal', MONO('score >= 60')],
+        ]
+    )}
 ${H3('Assignment & mutation')}
 ${TABLE(
-  ['Operator', 'Meaning', 'Example'],
-  [
-    [MONO('let x = v'),  'Bind v to x (first assignment)', MONO('let count = 0')],
-    [MONO('expr -> x'),  'Assign expression result to x',  MONO('x * 2 -> x')],
-    [MONO('x++'),        'Increment x by 1',               MONO('i++')],
-    [MONO('x += n'),     'Add n to x in place',            MONO('total += price')],
-  ]
-)}
+        ['Operator', 'Meaning', 'Example'],
+        [
+            [MONO('let x = v'), 'Bind v to x (first assignment)', MONO('let count = 0')],
+            [MONO('expr -> x'), 'Assign expression result to x', MONO('x * 2 -> x')],
+            [MONO('x++'), 'Increment x by 1', MONO('i++')],
+            [MONO('x += n'), 'Add n to x in place', MONO('total += price')],
+        ]
+    )}
 ${H3('String operator')}
 ${TABLE(
-  ['Operator', 'Meaning', 'Example'],
-  [
-    [MONO('+'), 'String concatenation', MONO('"Hello" + " " + "World"')],
-  ]
-)}
+        ['Operator', 'Meaning', 'Example'],
+        [
+            [MONO('+'), 'String concatenation', MONO('"Hello" + " " + "World"')],
+        ]
+    )}
 ${H3('Operator precedence (high to low)')}
 ${TABLE(
-  ['Level', 'Operators'],
-  [
-    ['Highest', MONO('()')],
-    ['', MONO('*  /')],
-    ['', MONO('+  -')],
-    ['Lowest', MONO('==  !=  <  >  <=  >=')],
-  ]
-)}
+        ['Level', 'Operators'],
+        [
+            ['Highest', MONO('()')],
+            ['', MONO('*  /')],
+            ['', MONO('+  -')],
+            ['Lowest', MONO('==  !=  <  >  <=  >=')],
+        ]
+    )}
 ${CODE(`
 -- Precedence examples
 print 2 + 3 * 4      -- 14  (multiplication first)
@@ -1812,51 +1812,51 @@ print 10 - 2 - 3     -- 5   (left-to-right)
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Справочник операторов')}
 ${H3('Арифметика')}
 ${TABLE(
-  ['Оператор', 'Значение', 'Пример', 'Результат'],
-  [
-    [MONO('+'), 'Сложение',      MONO('3 + 4'),  MONO('7')],
-    [MONO('-'), 'Вычитание',     MONO('10 - 3'), MONO('7')],
-    [MONO('*'), 'Умножение',     MONO('3 * 4'),  MONO('12')],
-    [MONO('/'), 'Целочисленное деление', MONO('10 / 3'), MONO('3')],
-  ]
-)}
+        ['Оператор', 'Значение', 'Пример', 'Результат'],
+        [
+            [MONO('+'), 'Сложение', MONO('3 + 4'), MONO('7')],
+            [MONO('-'), 'Вычитание', MONO('10 - 3'), MONO('7')],
+            [MONO('*'), 'Умножение', MONO('3 * 4'), MONO('12')],
+            [MONO('/'), 'Целочисленное деление', MONO('10 / 3'), MONO('3')],
+        ]
+    )}
 ${NOTE('HypeLang использует целочисленную арифметику. Деление округляется к нулю: <code class="g-inline">7 / 2 = 3</code>, а не 3.5.')}
 ${H3('Сравнение')}
 ${TABLE(
-  ['Оператор', 'Значение', 'Пример'],
-  [
-    [MONO('=='), 'Равно',                    MONO('x == 5')],
-    [MONO('!='), 'Не равно',                 MONO('x != 0')],
-    [MONO('<'),  'Меньше',                   MONO('a < b')],
-    [MONO('>'),  'Больше',                   MONO('a > b')],
-    [MONO('<='), 'Меньше или равно',         MONO('n <= 10')],
-    [MONO('>='), 'Больше или равно',         MONO('score >= 60')],
-  ]
-)}
+        ['Оператор', 'Значение', 'Пример'],
+        [
+            [MONO('=='), 'Равно', MONO('x == 5')],
+            [MONO('!='), 'Не равно', MONO('x != 0')],
+            [MONO('<'), 'Меньше', MONO('a < b')],
+            [MONO('>'), 'Больше', MONO('a > b')],
+            [MONO('<='), 'Меньше или равно', MONO('n <= 10')],
+            [MONO('>='), 'Больше или равно', MONO('score >= 60')],
+        ]
+    )}
 ${H3('Присваивание и мутация')}
 ${TABLE(
-  ['Оператор', 'Значение', 'Пример'],
-  [
-    [MONO('let x = v'),  'Привязать v к x (первое создание)', MONO('let count = 0')],
-    [MONO('expr -> x'),  'Присвоить результат выражения к x', MONO('x * 2 -> x')],
-    [MONO('x++'),        'Увеличить x на 1',                   MONO('i++')],
-    [MONO('x += n'),     'Прибавить n к x',                    MONO('total += price')],
-  ]
-)}
+        ['Оператор', 'Значение', 'Пример'],
+        [
+            [MONO('let x = v'), 'Привязать v к x (первое создание)', MONO('let count = 0')],
+            [MONO('expr -> x'), 'Присвоить результат выражения к x', MONO('x * 2 -> x')],
+            [MONO('x++'), 'Увеличить x на 1', MONO('i++')],
+            [MONO('x += n'), 'Прибавить n к x', MONO('total += price')],
+        ]
+    )}
 ${H3('Приоритет операторов (от высокого к низкому)')}
 ${TABLE(
-  ['Уровень', 'Операторы'],
-  [
-    ['Высший', MONO('()')],
-    ['', MONO('*  /')],
-    ['', MONO('+  -')],
-    ['Низший', MONO('==  !=  <  >  <=  >=')],
-  ]
-)}
+        ['Уровень', 'Операторы'],
+        [
+            ['Высший', MONO('()')],
+            ['', MONO('*  /')],
+            ['', MONO('+  -')],
+            ['Низший', MONO('==  !=  <  >  <=  >=')],
+        ]
+    )}
 ${CODE(`
 -- Примеры приоритета
 print 2 + 3 * 4      -- 14  (умножение первым)
@@ -1868,7 +1868,7 @@ print 10 - 2 - 3     -- 5   (слева направо)
 
 // ── 14. Advanced Patterns ─────────────────────────────────────
 const advanced = {
-  en: () => `
+    en: () => `
 ${H2('Advanced Patterns')}
 ${P('This section covers more complex programs that combine the features you have learned.')}
 ${H3('Bubble sort')}
@@ -1992,7 +1992,7 @@ flow main {
 `)}
 `,
 
-  ru: () => `
+    ru: () => `
 ${H2('Продвинутые паттерны')}
 ${P('В этом разделе рассматриваются более сложные программы, объединяющие изученные возможности языка.')}
 ${H3('Генерация последовательностей')}
@@ -2097,18 +2097,18 @@ flow main {
 // ══════════════════════════════════════════════════════════════
 
 export const GUIDE_SECTIONS = [
-  { id: 'intro',      icon: '🚀', title: { en: 'Introduction',           ru: 'Введение'              }, content: intro          },
-  { id: 'variables',  icon: '📦', title: { en: 'Variables & Types',      ru: 'Переменные и типы'     }, content: variables      },
-  { id: 'functions',  icon: '⚡', title: { en: 'Functions',              ru: 'Функции'               }, content: functions      },
-  { id: 'conditionals',icon: '🔀',title: { en: 'Conditionals',           ru: 'Условия'               }, content: conditionals   },
-  { id: 'patterns',   icon: '🔍', title: { en: 'Pattern Matching',       ru: 'Сопоставление'         }, content: patternMatching},
-  { id: 'loops',      icon: '🔄', title: { en: 'Loops',                  ru: 'Циклы'                 }, content: loops          },
-  { id: 'lists',      icon: '📋', title: { en: 'Lists',                  ru: 'Списки'                }, content: lists          },
-  { id: 'recursion',  icon: '♻️', title: { en: 'Recursion',              ru: 'Рекурсия'              }, content: recursion      },
-  { id: 'hof',        icon: '🧩', title: { en: 'Higher-Order Functions', ru: 'Функции высш. порядка' }, content: higherOrder    },
-  { id: 'lazy',       icon: '💤', title: { en: 'Lazy Evaluation',        ru: 'Ленивые вычисления'    }, content: lazyEval       },
-  { id: 'fileio',     icon: '📁', title: { en: 'File I/O',               ru: 'Файловый ввод-вывод'   }, content: fileIO         },
-  { id: 'charts',     icon: '📊', title: { en: 'Data Visualization',     ru: 'Визуализация данных'   }, content: charts         },
-  { id: 'operators',  icon: '⚙️', title: { en: 'Operators Reference',    ru: 'Справочник операторов' }, content: operators      },
-  { id: 'advanced',   icon: '🏆', title: { en: 'Advanced Patterns',      ru: 'Продвинутые паттерны'  }, content: advanced       },
+    { id: 'intro', icon: '🚀', title: { en: 'Introduction', ru: 'Введение' }, content: intro },
+    { id: 'variables', icon: '📦', title: { en: 'Variables & Types', ru: 'Переменные и типы' }, content: variables },
+    { id: 'functions', icon: '⚡', title: { en: 'Functions', ru: 'Функции' }, content: functions },
+    { id: 'conditionals', icon: '🔀', title: { en: 'Conditionals', ru: 'Условия' }, content: conditionals },
+    { id: 'patterns', icon: '🔍', title: { en: 'Pattern Matching', ru: 'Сопоставление' }, content: patternMatching },
+    { id: 'loops', icon: '🔄', title: { en: 'Loops', ru: 'Циклы' }, content: loops },
+    { id: 'lists', icon: '📋', title: { en: 'Lists', ru: 'Списки' }, content: lists },
+    { id: 'recursion', icon: '♻️', title: { en: 'Recursion', ru: 'Рекурсия' }, content: recursion },
+    { id: 'hof', icon: '🧩', title: { en: 'Higher-Order Functions', ru: 'Функции высш. порядка' }, content: higherOrder },
+    { id: 'lazy', icon: '💤', title: { en: 'Lazy Evaluation', ru: 'Ленивые вычисления' }, content: lazyEval },
+    { id: 'fileio', icon: '📁', title: { en: 'File I/O', ru: 'Файловый ввод-вывод' }, content: fileIO },
+    { id: 'charts', icon: '📊', title: { en: 'Data Visualization', ru: 'Визуализация данных' }, content: charts },
+    { id: 'operators', icon: '⚙️', title: { en: 'Operators Reference', ru: 'Справочник операторов' }, content: operators },
+    { id: 'advanced', icon: '🏆', title: { en: 'Advanced Patterns', ru: 'Продвинутые паттерны' }, content: advanced },
 ]

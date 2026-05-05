@@ -2,7 +2,7 @@ export const BUILTIN_DOCS = [
   {
     name: 'len',
     signature: 'len(collection)',
-    detail:    { en: 'Returns the length of a list or string.',             ru: 'Возвращает длину списка или строки.' },
+    detail: { en: 'Returns the length of a list or string.', ru: 'Возвращает длину списка или строки.' },
     doc: {
       en: 'Returns the number of elements in a list, or the number of characters in a string.\n\n**Example:**\n```\nlet n = len([1, 2, 3])  -- 3\nlet s = len("hello")    -- 5\n```',
       ru: 'Возвращает количество элементов в списке или символов в строке.\n\n**Пример:**\n```\nlet n = len([1, 2, 3])  -- 3\nlet s = len("hello")    -- 5\n```'
@@ -124,75 +124,101 @@ export const BUILTIN_DOCS = [
 export const KEYWORD_SNIPPETS = [
   {
     label: 'flow',
-    detail:  { en: 'Define a function',               ru: 'Определить функцию' },
-    doc:     { en: 'Defines a named function. The last expression in the body is the return value.',
-                ru: 'Определяет именованную функцию. Последнее выражение в теле — возвращаемое значение.' },
+    detail: { en: 'Define a function', ru: 'Определить функцию' },
+    doc: {
+      en: 'Defines a named function. The last expression in the body is the return value.',
+      ru: 'Определяет именованную функцию. Последнее выражение в теле — возвращаемое значение.'
+    },
     snippet: 'flow ${1:name} ${2:args} {\n\t$0\n}'
   },
   {
     label: 'let',
-    detail:  { en: 'Bind a value to a name',           ru: 'Привязать значение к имени' },
-    doc:     { en: 'Creates a new variable binding in the current scope.',
-                ru: 'Создаёт новую привязку переменной в текущей области видимости.' },
+    detail: { en: 'Bind a value to a name', ru: 'Привязать значение к имени' },
+    doc: {
+      en: 'Creates a new variable binding in the current scope.',
+      ru: 'Создаёт новую привязку переменной в текущей области видимости.'
+    },
     snippet: 'let ${1:name} = ${2:value}'
   },
   {
     label: 'when',
-    detail:  { en: 'Conditional expression (if/else)', ru: 'Условное выражение (if/else)' },
-    doc:     { en: 'Executes one of two branches based on a condition.',
-                ru: 'Выполняет одну из двух ветвей в зависимости от условия.' },
+    detail: { en: 'Conditional expression (if/else)', ru: 'Условное выражение (if/else)' },
+    doc: {
+      en: 'Executes one of two branches based on a condition.',
+      ru: 'Выполняет одну из двух ветвей в зависимости от условия.'
+    },
     snippet: 'when ${1:condition} {\n\t$2\n} else {\n\t$3\n}'
   },
   {
     label: 'while',
-    detail:  { en: 'While loop',                       ru: 'Цикл while' },
-    doc:     { en: 'Repeats the body while the condition is true.',
-                ru: 'Повторяет тело, пока условие истинно.' },
+    detail: { en: 'While loop', ru: 'Цикл while' },
+    doc: {
+      en: 'Repeats the body while the condition is true.',
+      ru: 'Повторяет тело, пока условие истинно.'
+    },
     snippet: 'while ${1:condition} {\n\t$0\n}'
   },
   {
     label: 'for',
-    detail:  { en: 'For-in loop over a list',          ru: 'Цикл for-in по списку' },
-    doc:     { en: 'Iterates over each element of a list.',
-                ru: 'Перебирает каждый элемент списка.' },
+    detail: { en: 'For-in loop over a list', ru: 'Цикл for-in по списку' },
+    doc: {
+      en: 'Iterates over each element of a list.',
+      ru: 'Перебирает каждый элемент списка.'
+    },
     snippet: 'for ${1:list} use ${2:item} {\n\t$0\n}'
   },
   {
     label: 'match',
-    detail:  { en: 'Pattern matching expression',      ru: 'Сопоставление с образцом' },
-    doc:     { en: 'Matches a value against a series of patterns. Use `_` as a wildcard.',
-                ru: 'Сопоставляет значение с набором образцов. Используй `_` как заглушку.' },
+    detail: { en: 'Pattern matching expression', ru: 'Сопоставление с образцом' },
+    doc: {
+      en: 'Matches a value against a series of patterns. Use `_` as a wildcard.',
+      ru: 'Сопоставляет значение с набором образцов. Используй `_` как заглушку.'
+    },
     snippet: 'match ${1:value} {\n\t${2:0} -> ${3:result};\n\t_ -> ${4:default};\n}'
   },
   {
     label: 'print',
-    detail:  { en: 'Print a value to the output',      ru: 'Вывести значение на экран' },
-    doc:     { en: 'Prints the value to standard output.',
-                ru: 'Выводит значение в стандартный вывод.' },
+    detail: { en: 'Print a value to the output', ru: 'Вывести значение на экран' },
+    doc: {
+      en: 'Prints the value to standard output.',
+      ru: 'Выводит значение в стандартный вывод.'
+    },
     snippet: 'print ${1:value}'
   },
   {
     label: 'lazy',
-    detail:  { en: 'Defer evaluation',                 ru: 'Отложить вычисление' },
-    doc:     { en: 'Creates a lazy value — not computed until `force` is called.',
-                ru: 'Создаёт отложенное значение — не вычисляется до вызова `force`.' },
+    detail: { en: 'Defer evaluation', ru: 'Отложить вычисление' },
+    doc: {
+      en: 'Creates a lazy value — not computed until `force` is called.',
+      ru: 'Создаёт отложенное значение — не вычисляется до вызова `force`.'
+    },
     snippet: 'lazy (${1:expression})'
   },
   {
     label: 'force',
-    detail:  { en: 'Evaluate a lazy value',            ru: 'Вычислить отложенное значение' },
-    doc:     { en: 'Forces evaluation of a lazy value and caches the result.',
-                ru: 'Принудительно вычисляет ленивое значение и кэширует результат.' },
+    detail: { en: 'Evaluate a lazy value', ru: 'Вычислить отложенное значение' },
+    doc: {
+      en: 'Forces evaluation of a lazy value and caches the result.',
+      ru: 'Принудительно вычисляет ленивое значение и кэширует результат.'
+    },
     snippet: 'force ${1:lazyValue}'
   }
 ]
 
 export const OPERATORS_DOCS = [
-  { op: '->',           sig: 'expr -> name',   detail: { en: 'Assign result to variable',   ru: 'Присвоить результат переменной' } },
-  { op: '++',           sig: 'x++',            detail: { en: 'Increment by 1',               ru: 'Увеличить на 1' } },
-  { op: '+=',           sig: 'x += n',         detail: { en: 'Add n to variable in-place',   ru: 'Прибавить n к переменной' } },
-  { op: '+  -  *  /',   sig: 'a + b',          detail: { en: 'Arithmetic operators',         ru: 'Арифметические операторы' } },
-  { op: '==  !=  <  >  <=  >=', sig: 'a == b', detail: { en: 'Comparison operators',        ru: 'Операторы сравнения' } },
+  { op: '->', sig: 'expr -> name', detail: { en: 'Assign result to variable', ru: 'Присвоить результат переменной' } },
+  { op: '++', sig: 'x++', detail: { en: 'Increment by 1', ru: 'Увеличить на 1' } },
+  { op: '+=', sig: 'x += n', detail: { en: 'Add n to variable in-place', ru: 'Прибавить n к переменной' } },
+  { op: '+', sig: 'a + b', detail: { en: 'Addition', ru: 'Сложение' } },
+  { op: '-', sig: 'a - b', detail: { en: 'Subtraction', ru: 'Вычитание' } },
+  { op: '*', sig: 'a * b', detail: { en: 'Multiplication', ru: 'Умножение' } },
+  { op: '/', sig: 'a / b', detail: { en: 'Integer division', ru: 'Целочисленное деление' } },
+  { op: '==', sig: 'a == b', detail: { en: 'Equal to', ru: 'Равно' } },
+  { op: '!=', sig: 'a != b', detail: { en: 'Not equal to', ru: 'Не равно' } },
+  { op: '<', sig: 'a < b', detail: { en: 'Less than', ru: 'Меньше' } },
+  { op: '>', sig: 'a > b', detail: { en: 'Greater than', ru: 'Больше' } },
+  { op: '<=', sig: 'a <= b', detail: { en: 'Less than or equal', ru: 'Меньше или равно' } },
+  { op: '>=', sig: 'a >= b', detail: { en: 'Greater than or equal', ru: 'Больше или равно' } },
 ]
 
 export function registerCompletions(monaco) {
@@ -202,15 +228,15 @@ export function registerCompletions(monaco) {
       const word = model.getWordUntilPosition(position)
       const range = {
         startLineNumber: position.lineNumber,
-        endLineNumber:   position.lineNumber,
-        startColumn:     word.startColumn,
-        endColumn:       word.endColumn
+        endLineNumber: position.lineNumber,
+        startColumn: word.startColumn,
+        endColumn: word.endColumn
       }
 
       const builtins = BUILTIN_DOCS.map(b => ({
-        label:    b.name,
-        kind:     monaco.languages.CompletionItemKind.Function,
-        detail:   b.detail.en,
+        label: b.name,
+        kind: monaco.languages.CompletionItemKind.Function,
+        detail: b.detail.en,
         documentation: { value: `**${b.signature}**\n\n${b.doc.en}`, isTrusted: true },
         insertText: b.snippet,
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
@@ -218,9 +244,9 @@ export function registerCompletions(monaco) {
       }))
 
       const keywords = KEYWORD_SNIPPETS.map(k => ({
-        label:    k.label,
-        kind:     monaco.languages.CompletionItemKind.Keyword,
-        detail:   k.detail.en,
+        label: k.label,
+        kind: monaco.languages.CompletionItemKind.Keyword,
+        detail: k.detail.en,
         documentation: { value: k.doc.en, isTrusted: true },
         insertText: k.snippet,
         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
@@ -228,7 +254,7 @@ export function registerCompletions(monaco) {
       }))
 
       const literals = [
-        { label: 'true',  kind: monaco.languages.CompletionItemKind.Value, insertText: 'true',  range },
+        { label: 'true', kind: monaco.languages.CompletionItemKind.Value, insertText: 'true', range },
         { label: 'false', kind: monaco.languages.CompletionItemKind.Value, insertText: 'false', range },
       ]
 
